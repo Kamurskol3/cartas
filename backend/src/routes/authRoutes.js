@@ -1,7 +1,7 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
-
+import { registerValidationRules, loginValidationRules, validate } from '../middleware/validators.js';
 const router = express.Router();
 //o server criara um token contendo as informações do usuário
 //o app guardará esse token e o enviará em cada requisição para provar a identidade
@@ -10,11 +10,11 @@ const router = express.Router();
 //função para gerar o token JWT
 const generateToken = (id) => {
 //gera o token com o id do usuario, a chave secreta e o tempo de expiração
-   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "15d" });
+    return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "30m" });
 }
 
 //função para registrar um novo usuário
-router.post("/register", async (req, res) => {
+router.post("/register", registerValidationRules(), validate, async (req, res) => {
     try {
         const { username, email, password } = req.body;
     
@@ -70,7 +70,7 @@ router.post("/register", async (req, res) => {
     }
 }); 
 
-router.post("/login", async (req, res) => {
+router.post("/login", loginValidationRules(), validate, async (req, res) => {
     try {
         const { email, password } = req.body;
 
